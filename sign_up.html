@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>注册</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body{
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 让它竖着排列 */
+            flex-direction: column;
+        }
+        
+        .form_wrapper{
+            border:1px solid #ddd;
+            padding: 20px;
+        }
+        .form_wrapper .row{
+            margin:10px 0;
+        }
+        .form_wrapper .row>label{
+            display: inline-block;
+            min-width: 5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form_wrapper">
+        <h1>注册</h1>
+        <form action="">
+            <div class="row">
+                <label for="">邮箱:</label>
+                <input type="text" name="email">
+            </div>
+            <div class="row">
+                <label for="">密码:</label>
+                <input type="password" name="password">
+            </div>
+            <div class="row">
+                <label for="">重复密码:</label>
+                <input type="password" name="repassword">
+            </div>
+            <div class="row">
+                <input type="submit" value="注册">
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

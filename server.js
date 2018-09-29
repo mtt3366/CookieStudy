@@ -28,6 +28,13 @@ var server = http.createServer(function (request, response) {
     response.setHeader('Content-Type', 'text/html;charset=utf-8')
     response.write(string)
     response.end()
+  } else if(path === '/sign_up'){
+    response.statusCode = 200
+    let string = fs.readFileSync('./sign_up.html')
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+
   } else {
     response.statusCode = 404
     response.setHeader('Content-Type', 'application/json;charset=utf-8')
