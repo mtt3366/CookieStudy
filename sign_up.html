@@ -38,7 +38,7 @@
 <body>
     <div class="form_wrapper">
         <h1>注册</h1>
-        <form action="">
+        <form action="" id="signUpForm">
             <div class="row">
                 <label for="">邮箱:</label>
                 <input type="text" name="email">
@@ -57,5 +57,19 @@
         </form>
     </div>
 </body>
-
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script>
+    let $signUpForm = $("#signUpForm")
+    let hash={};
+    $signUpForm.on("submit", (e)=>{
+        e.preventDefault()
+        let need = ['email','password','repassword']
+        need.forEach((name)=>{
+            let value = $signUpForm.find(`[name=${name}]`).val()
+            hash[name] = value
+        })
+        console.log(hash);
+    })
+    
+</script>
 </html>
