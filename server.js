@@ -58,7 +58,7 @@ var server = http.createServer(function (request, response) {
                 response.write(`{
                         "email":"invalid"
                 }`)
-            } else {//存入db中的users数据库
+            } else { //存入db中的users数据库
                 var users = fs.readFileSync('./db/users', 'utf8')
                 console.log(users)
                 console.log(typeof users)
@@ -88,6 +88,50 @@ var server = http.createServer(function (request, response) {
                     fs.writeFileSync('./db/users', usersString)
                     response.statusCode = 200
                 }
+            }
+            response.end()
+        })
+    } 
+    /*接下来是登录的两个路由*/ 
+    else if (path === '/sign_in' && method === 'GET') {//同样GET是获取登录页面,POST是表单提交
+        let string = fs.readFileSync('./sign_in.html', 'utf8')
+        response.statusCode = 200
+        response.setHeader('Content-Type', 'text/html;charset=utf-8')
+        response.write(string)
+        response.end()
+    } else if (path === '/sign_in' && method === 'POST') {
+        readBody(request).then((body) => {
+            let strings = body.split('&') // ['email=1', 'password=2', 'password_confirmation=3']
+            let hash = {}
+            strings.forEach((string) => {
+                // string == 'email=1'
+                let parts = string.split('=') // ['email', '1']
+                let key = parts[0]
+                let value = parts[1]
+                hash[key] = decodeURIComponent(value) // hash['email'] = '1'
+            })
+            let {
+                email,
+                password
+            } = hash
+            var users = fs.readFileSync('./db/users', 'utf8')
+            try {
+                users = JSON.parse(users) // []
+            } catch (exception) {
+                users = []
+            }
+            let found
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].email === email && users[i].password === password) {
+                    found = true
+                    break
+                }
+            }
+            if (found) {//验证成功,设置登录Cookie为登录的邮箱,并放在响应里发给浏览器
+                response.setHeader('Set-Cookie', `sign_in_email=${email}`)
+                response.statusCode = 200
+            } else {
+                response.statusCode = 401
             }
             response.end()
         })
