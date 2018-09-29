@@ -38,7 +38,7 @@ var server = http.createServer(function (request, response) {
         response.end()
     } else if (path === '/sign_up' && method === 'POST') { //提交注册表单的路由
         readBody(request).then((body) => { //使用封装的读取body的函数,成功后参数为body,因为这里是异步事件,所以需要使用promise封装
-            let message = body.split('&')//['email=1','password=2','repassword=3']
+            let message = body.split('&') //['email=1','password=2','repassword=3']
             let hash = {}
             message.forEach(element => {
                 let parts = element.split('=')
@@ -47,18 +47,50 @@ var server = http.createServer(function (request, response) {
                 hash[key] = decodeURIComponent(value)
             });
             console.log(hash);
-            let {email,password,repassword} = hash//es6语法
-            if(email.indexOf('@') === -1){//邮箱中没有@,返回一个邮箱无效的错误json
-                response.statusCode = 400 
+            let {
+                email,
+                password,
+                repassword
+            } = hash //es6语法
+            if (email.indexOf('@') === -1) { //邮箱中没有@,返回一个邮箱无效的错误json
+                response.statusCode = 400
                 response.setHeader('Content-Type', 'application/json;charset=utf-8')
                 response.write(`{
                         "email":"invalid"
                 }`)
+            } else {//存入db中的users数据库
+                var users = fs.readFileSync('./db/users', 'utf8')
+                console.log(users)
+                console.log(typeof users)
+                try {
+                    users = JSON.parse(users) // []
+                    console.log(typeof users)
+                } catch (exception) {
+                    users = []
+                }
+                let inUse = false
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i]
+                    if (user.email === email) {
+                        inUse = true
+                        break;
+                    }
+                }
+                if (inUse) {
+                    response.statusCode = 400
+                    response.write('email in use')
+                } else {
+                    users.push({
+                        email: email,
+                        password: password
+                    })
+                    var usersString = JSON.stringify(users)
+                    fs.writeFileSync('./db/users', usersString)
+                    response.statusCode = 200
+                }
             }
             response.end()
         })
-
-
     } else {
         response.statusCode = 404
         response.setHeader('Content-Type', 'application/json;charset=utf-8')

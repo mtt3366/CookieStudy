@@ -96,7 +96,9 @@
                 console.log('注册成功');
                 console.log(response)
             }, (request) => {
+                console.log('注册失败');
                 let error = request.responseJSON //request.responseJSON是返回的响应体,他直接是一个对象
+                console.log(error);
                 //判断服务器返回的验证
                 if (error.email && error.email === 'invalid') {
                     $signUpForm.find('[name=email]').siblings('.error').text("邮箱格式错误")
