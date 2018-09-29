@@ -97,6 +97,10 @@
                 console.log(response)
             }, (request) => {
                 console.log('注册失败');
+                if(request.responseText === 'email in use'){
+                    console.log('邮箱已存在');
+                    return
+                }
                 let error = request.responseJSON //request.responseJSON是返回的响应体,他直接是一个对象
                 console.log(error);
                 //判断服务器返回的验证
