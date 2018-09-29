@@ -22,6 +22,7 @@
         }
         
         .form_wrapper{
+            min-width: 400px;
             border:1px solid #ddd;
             padding: 20px;
         }
@@ -42,14 +43,20 @@
             <div class="row">
                 <label for="">邮箱:</label>
                 <input type="text" name="email">
+
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label for="">密码:</label>
                 <input type="password" name="password">
+
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label for="">重复密码:</label>
                 <input type="password" name="repassword">
+
+                <span class="error"></span>
             </div>
             <div class="row">
                 <input type="submit" value="注册">
@@ -60,16 +67,42 @@
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
 <script>
     let $signUpForm = $("#signUpForm")
-    let hash={};
-    $signUpForm.on("submit", (e)=>{
+
+    $signUpForm.on("submit", (e) => {
         e.preventDefault()
-        let need = ['email','password','repassword']
-        need.forEach((name)=>{
+        let hash = {}
+        let need = ['email', 'password', 'repassword']
+        need.forEach((name) => {
             let value = $signUpForm.find(`[name=${name}]`).val()
             hash[name] = value
         })
-        console.log(hash);
+
+        //简易表单验证
+        $signUpForm.find('.error').text('')
+
+        for (var key in hash) {
+            if(hash[key] === ''){
+                $signUpForm.find(`[name=${key}]`).siblings('.error').text(`${key}不能为空`)
+                return
+            }
+        }
+        if (hash.password !== hash.repassword) {
+            $signUpForm.find('[name=repassword]').siblings('.error').text("密码输入不一致")
+            return
+        }
+
+        $.post('/sign_up', hash)
+            .then((response) => {
+                console.log('注册成功');
+                console.log(response)
+            }, (request) => {
+                let error = request.responseJSON //request.responseJSON是返回的响应体,他直接是一个对象
+                //判断服务器返回的验证
+                if (error.email && error.email === 'invalid') {
+                    $signUpForm.find('[name=email]').siblings('.error').text("邮箱格式错误")
+                }
+            })
     })
-    
 </script>
+
 </html>
