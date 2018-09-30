@@ -93,16 +93,19 @@
 
         $.post('/sign_up', hash)
             .then((response) => {
-                console.log('注册成功');
+                console.log('注册成功')
+                alert('注册成功即将跳转到登录界面')
+                window.location = "./sign_in"
+
                 console.log(response)
             }, (request) => {
-                console.log('注册失败');
+                console.log('注册失败')
                 if(request.responseText === 'email in use'){
-                    console.log('邮箱已存在');
+                    console.log('邮箱已存在')
                     return
                 }
                 let error = request.responseJSON //request.responseJSON是返回的响应体,他直接是一个对象
-                console.log(error);
+                console.log(error)
                 //判断服务器返回的验证
                 if (error.email && error.email === 'invalid') {
                     $signUpForm.find('[name=email]').siblings('.error').text("邮箱格式错误")
