@@ -27,6 +27,39 @@ var server = http.createServer(function (request, response) {
     if (path === '/') {
         response.statusCode = 200
         let string = fs.readFileSync('./index.html')
+        string = string.toString();
+        var users = fs.readFileSync('./db/users', 'utf8')
+        users = JSON.parse(users)//转化为user对象数组
+
+        console.log(users);
+        let cookies = request.headers.cookie || ''//['email=111', 'asdasd=111']
+        cookies = cookies.split("; ")
+        let hash={}
+        cookies.forEach((string)=>{
+            let parts = string.split("=")
+            let key = parts[0]
+            let value = parts[1]
+            hash[key] = value;
+        })
+        
+        let eamil = hash.sign_in_email
+        let foundedUser
+        users.forEach((userObj)=>{
+            if(userObj.email===eamil){
+                foundedUser = userObj;
+            }
+        })
+        console.log(foundedUser);
+        if(foundedUser){
+            string = string.replace('__status__', '已登录')
+            string = string.replace('__email__', foundedUser.email)
+            string = string.replace('__password__', foundedUser.password)
+        }else{
+            string = string.replace('__status__', '未登录,请去登录')
+            string = string.replace('__email__', '没')
+            string = string.replace('__password__', '没')
+        }
+        
         response.setHeader('Content-Type', 'text/html;charset=utf-8')
         response.write(string)
         response.end()
@@ -59,7 +92,7 @@ var server = http.createServer(function (request, response) {
                         "email":"invalid"
                 }`)
             } else { //存入db中的users数据库
-                var users = fs.readFileSync('./db/users', 'utf8')
+                let users = fs.readFileSync('./db/users', 'utf8')
                 console.log(users)
                 console.log(typeof users)
                 try {
@@ -84,7 +117,7 @@ var server = http.createServer(function (request, response) {
                         email: email,
                         password: password
                     })
-                    var usersString = JSON.stringify(users)
+                    let usersString = JSON.stringify(users)
                     fs.writeFileSync('./db/users', usersString)
                     response.statusCode = 200
                 }

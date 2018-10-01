@@ -6,48 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Cookie与注册登录</title>
-    <style>
-        .logined {
-            display: none;
-        }
-    </style>
+
 </head>
 
 <body>
-    我是首页
-    <div class="status notLogined">
-        状态: 未登录
+    <h1>我是首页</h1>
+    <div class="">
         <a href="./sign_up">注册</a>
         <a href="./sign_in">登录</a>
     </div>
+    
+    <h1>你的状态是:__status__</h1>
+    <h1>你的邮箱账号是:__email__</h1>
+    <h1>你的密码是:__password__</h1>
 
-    <div class="status logined">
-        状态: 已登录
-        用户名(用户邮箱)为: <span class="userEmail"></span>
-        <a href="javascript:;" id="logOff">点此退出登录(清空Cookie)</a>
-    </div>
-
-    首页的Cookie为: <span id="indexCookie"></span>
+    <a href="javascript:;" id="logOffBtn">退出登录(删除cookie)</a>
 
 </body>
 <script>
-    let notLoginDiv = document.getElementsByClassName('notLogined')[0]
-    let logined = document.getElementsByClassName('logined')[0]
-    let userEmail = document.querySelector('.logined .userEmail')
-
-    // 如果Cookie存在,说明以前以前过,那么就直接显示登录的页面
-    if (document.cookie) {
-        notLoginDiv.style.display = "none"
-        logined.style.display = "block"
-        let email = document.cookie.split("=")[1]
-        userEmail.innerHTML = email
-    }
-
-    indexCookie.innerHTML = document.cookie
-
-    let logOffBtn = document.querySelector("#logOff")
-    // 删除 cookie,退出登录,并刷新页面
-    logOffBtn.addEventListener("click", () => {
+logOffBtn.addEventListener("click", () => {
         // 删除一个现存 Cookie 的唯一方法，是设置它的expires属性为一个过去的日期。
         document.cookie = 'sign_in_email=;expires=Thu, 01-Jan-1970 00:00:01 GMT'
         window.location = "/"
