@@ -3,6 +3,8 @@ var fs = require('fs')
 var url = require('url')
 var port = process.argv[2]
 
+var sessions ={}
+
 if (!port) {
     console.log('请指定端口号好不啦？\nnode server.js 8888 这样不会吗？')
     process.exit(1)
@@ -20,6 +22,7 @@ var server = http.createServer(function (request, response) {
     var method = request.method
 
     /******** 从这里开始看，上面不要看 ************/
+    
     //   这里开始写注册登录的路由
 
     console.log('方方说：含查询字符串的路径\n' + pathWithQuery)
@@ -31,8 +34,9 @@ var server = http.createServer(function (request, response) {
         var users = fs.readFileSync('./db/users', 'utf8')
         users = JSON.parse(users)//转化为user对象数组
 
-        console.log(users);
-        let cookies = request.headers.cookie || ''//['email=111', 'asdasd=111']
+        console.log(users);//打印在服务器端的控制台
+        let cookies = request.headers.cookie || ''//'sessionID=xxx', 'asdasd=111'
+        console.log("cookies:"+cookies);
         cookies = cookies.split("; ")
         let hash={}
         cookies.forEach((string)=>{
@@ -41,15 +45,21 @@ var server = http.createServer(function (request, response) {
             let value = parts[1]
             hash[key] = value;
         })
-        
-        let eamil = hash.sign_in_email
+      
+        let eamil 
+        let mySession = sessions[hash.sessionID];
+
+        if(mySession){
+            console.log("mySession.sign_in_email:::"+mySession.sign_in_email)
+            eamil = sessions[hash.sessionID].sign_in_email
+        }
         let foundedUser
         users.forEach((userObj)=>{
             if(userObj.email===eamil){
                 foundedUser = userObj;
             }
         })
-        console.log(foundedUser);
+        console.log("foundedUser"+foundedUser);
         if(foundedUser){
             string = string.replace('__status__', '已登录')
             string = string.replace('__email__', foundedUser.email)
@@ -156,12 +166,16 @@ var server = http.createServer(function (request, response) {
             let found
             for (let i = 0; i < users.length; i++) {
                 if (users[i].email === email && users[i].password === password) {
-                    found = true
+                    found = true;//搜索数据库成功,那么把这个user对象的全部信息赋值给found
                     break
                 }
             }
             if (found) {//验证成功,设置登录Cookie为登录的邮箱,并放在响应里发给浏览器
-                response.setHeader('Set-Cookie', `sign_in_email=${email}`)
+                let sessionID = (Math.random())*100000
+                sessions[sessionID] = {sign_in_email:`${email}`}
+                console.log("登录时填进去的sessions的id为:"+sessionID)
+                console.log("登录时填进去的sessions的email:"+sessions[sessionID].sign_in_email)
+                response.setHeader('Set-Cookie', `sessionID=${sessionID}`)
                 response.statusCode = 200
             } else {
                 response.statusCode = 401
